@@ -48,7 +48,3 @@ public class CitaService implements ICitaService {
         return citas;
     }
 }
-
-
-    
-
