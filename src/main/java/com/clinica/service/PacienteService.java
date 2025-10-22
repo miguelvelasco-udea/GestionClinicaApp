@@ -1,7 +1,7 @@
 package com.clinica.service;
+
 import java.util.ArrayList;
 import java.util.List;
-
 import com.clinica.model.Medico;
 import com.clinica.exception.BusinessException;
 import com.clinica.model.Paciente;
@@ -70,4 +70,3 @@ public class PacienteService implements IPacienteService{
         return pacientes;
     }
 }   
-
