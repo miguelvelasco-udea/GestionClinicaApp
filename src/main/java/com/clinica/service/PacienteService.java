@@ -1,10 +1,9 @@
 package com.clinica.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import com.clinica.model.Medico;
 import com.clinica.exception.BusinessException;
 import com.clinica.model.Paciente;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacienteService implements IPacienteService{
     private List<Paciente> pacientes = new ArrayList<>();
@@ -28,12 +27,12 @@ public class PacienteService implements IPacienteService{
 
         @Override
     public Paciente actualizarPaciente(Paciente paciente) throws BusinessException {
-        if (paciente == null || paciente.getIdPaciente() <= 0) {
+        if (paciente == null || paciente.getDocumento() == null || paciente.getDocumento().isEmpty()) {
             throw new BusinessException("Datos del paciente inválidos.");
         }
 
         for (int i = 0; i < pacientes.size(); i++) {
-            if (pacientes.get(i).getIdPaciente() == paciente.getIdPaciente()) {
+            if (pacientes.get(i).getDocumento().equals(paciente.getDocumento())) {
                 pacientes.set(i, paciente);
                 return paciente;
             }
@@ -43,19 +42,13 @@ public class PacienteService implements IPacienteService{
     }
 
     @Override
-    public void eliminarPaciente(int idPaciente) throws BusinessException {
-        boolean eliminado = pacientes.removeIf(p -> p.getIdPaciente() == idPaciente);
-        if (!eliminado) {
-            throw new BusinessException("No se encontró el paciente para eliminar.");
-        }
+public void eliminarPaciente(String documento) throws BusinessException { // Cambiado a String
+    boolean eliminado = pacientes.removeIf(p -> p.getDocumento().equals(documento));
+    if (!eliminado) {
+        throw new BusinessException("No se encontró el paciente con documento: " + documento);
     }
-    @Override
-    public Paciente buscarPorId(int idPaciente) {
-        return pacientes.stream()
-                .filter(p -> p.getIdPaciente() == idPaciente)
-                .findFirst()
-                .orElse(null);
-    }
+}
+    
 
     @Override
     public Paciente buscarPorDocumento(String documento) {
@@ -67,6 +60,6 @@ public class PacienteService implements IPacienteService{
 
     @Override
     public List<Paciente> listarPacientes() {
-        return pacientes;
+        return new ArrayList<>(pacientes);
     }
 }   
