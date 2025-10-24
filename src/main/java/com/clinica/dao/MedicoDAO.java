@@ -46,7 +46,7 @@ public class MedicoDAO {
         }
     }
 
-    // Obtene lista de médicos
+    // Obtiene lista de médicos
     public List<Medico> obtenerMedicos() {
         List<Medico> lista = new ArrayList<>();
         File f = new File(archivo);
