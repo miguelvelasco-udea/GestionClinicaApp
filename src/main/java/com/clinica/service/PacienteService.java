@@ -1,6 +1,5 @@
 package com.clinica.service;
 
-import com.clinica.exception.BusinessException;
 import com.clinica.model.Paciente;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +8,16 @@ public class PacienteService implements IPacienteService{
     private List<Paciente> pacientes = new ArrayList<>();
 
     @Override
-    public Paciente registrarPaciente(Paciente paciente) throws BusinessException {
+    public Paciente registrarPaciente(Paciente paciente) throws Exception {
         if (paciente == null) {
-            throw new BusinessException("El paciente no puede ser nulo.");
+            throw new Exception("El paciente no puede ser nulo.");
         }
         if (paciente.getDocumento() == null || paciente.getDocumento().isEmpty()) {
-            throw new BusinessException("El documento del paciente es obligatorio.");
+            throw new Exception("El documento del paciente es obligatorio.");
         }
           for (Paciente p : pacientes) {
             if (p.getDocumento().equals(paciente.getDocumento())) {
-                throw new BusinessException("Ya existe un paciente con ese documento.");
+                throw new Exception("Ya existe un paciente con ese documento.");
             }
         }
         pacientes.add(paciente);
@@ -26,9 +25,9 @@ public class PacienteService implements IPacienteService{
     }
 
         @Override
-    public Paciente actualizarPaciente(Paciente paciente) throws BusinessException {
+    public Paciente actualizarPaciente(Paciente paciente) throws Exception {
         if (paciente == null || paciente.getDocumento() == null || paciente.getDocumento().isEmpty()) {
-            throw new BusinessException("Datos del paciente inválidos.");
+            throw new Exception("Datos del paciente inválidos.");
         }
 
         for (int i = 0; i < pacientes.size(); i++) {
@@ -38,14 +37,14 @@ public class PacienteService implements IPacienteService{
             }
         }
 
-        throw new BusinessException("No se encontró el paciente para actualizar.");
+        throw new Exception("No se encontró el paciente para actualizar.");
     }
 
     @Override
-public void eliminarPaciente(String documento) throws BusinessException { // Cambiado a String
+public void eliminarPaciente(String documento) throws Exception { // Cambiado a String
     boolean eliminado = pacientes.removeIf(p -> p.getDocumento().equals(documento));
     if (!eliminado) {
-        throw new BusinessException("No se encontró el paciente con documento: " + documento);
+        throw new Exception("No se encontró el paciente con documento: " + documento);
     }
 }
     
