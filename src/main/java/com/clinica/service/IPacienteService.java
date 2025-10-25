@@ -1,16 +1,16 @@
 package com.clinica.service;
 
-import java.util.List;
 import com.clinica.model.Paciente;
-import com.clinica.exception.BusinessException;
+import java.util.List;
+
 
 public interface IPacienteService {
     
-    Paciente registrarPaciente(Paciente paciente) throws BusinessException;
+    Paciente registrarPaciente(Paciente paciente) throws Exception;
     
-    Paciente actualizarPaciente(Paciente paciente) throws BusinessException;
+    Paciente actualizarPaciente(Paciente paciente) throws Exception;
     
-    void eliminarPaciente(String documento) throws BusinessException;
+    void eliminarPaciente(String documento) throws Exception;
     
     Paciente buscarPorDocumento(String documento);
     
