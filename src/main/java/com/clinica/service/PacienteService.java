@@ -41,10 +41,10 @@ public class PacienteService implements IPacienteService{
     }
 
     @Override
-public void eliminarPaciente(String documento) throws Exception { // Cambiado a String
-    boolean eliminado = pacientes.removeIf(p -> p.getDocumento().equals(documento));
-    if (!eliminado) {
-        throw new Exception("No se encontró el paciente con documento: " + documento);
+    public void eliminarPaciente(String documento) throws Exception { // Cambiado a String
+        boolean eliminado = pacientes.removeIf(p -> p.getDocumento().equals(documento));
+        if (!eliminado) {
+            throw new Exception("No se encontró el paciente con documento: " + documento);
     }
 }
     
