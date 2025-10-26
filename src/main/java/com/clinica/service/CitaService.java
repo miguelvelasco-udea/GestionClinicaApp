@@ -17,15 +17,12 @@ public class CitaService implements ICitaService {
             throw new Exception("La cita no puede ser nula");
         }
         
-        // Validar campos obligatorios
         validarCamposObligatorios(cita);
         
-        // Validar que no exista una cita duplicada
         if (existeCitaDuplicada(cita)) {
             throw new Exception("Ya existe una cita para este paciente en la misma fecha y hora");
         }
         
-        // Validar que la fecha no sea en el pasado
         if (cita.getFecha().isBefore(LocalDate.now())) {
             throw new Exception("No se pueden crear citas en fechas pasadas");
         }
@@ -35,20 +32,19 @@ public class CitaService implements ICitaService {
     }
     
     @Override
-    public void cancelarCita(int id) throws Exception {
-        // Validar ID válido
-        if (id <= 0) {
-            throw new Exception("ID de cita inválido");
+        public void cancelarCita(int id) throws Exception {
+            if (id <= 0) {
+                throw new Exception("ID de cita inválido");
         }
         
         Cita cita = buscarPorId(id);
         if (cita != null) {
-            // Validar que la cita no esté ya cancelada
+            
             if (cita.getEstado() == EstadoCita.CANCELADA) {
                 throw new Exception("La cita ya está cancelada");
             }
             
-            // Validar que no se cancele una cita ya completada
+            
             if (cita.getEstado() == EstadoCita.FINALIZADA) {
                 throw new Exception("No se puede cancelar una cita ya completada");
             }
@@ -61,34 +57,33 @@ public class CitaService implements ICitaService {
     
     @Override 
     public void reprogramarCita(int id, LocalDate nuevaFecha) throws Exception {
-        // Validar ID válido
+        
         if (id <= 0) {
             throw new Exception("ID de cita inválido");
         }
         
-        // Validar que la nueva fecha no sea nula
+        
         if (nuevaFecha == null) {
             throw new Exception("La nueva fecha no puede ser nula");
         }
         
-        // Validar que la nueva fecha no sea en el pasado
         if (nuevaFecha.isBefore(LocalDate.now())) {
             throw new Exception("No se puede reprogramar a una fecha pasada");
         }
         
         Cita cita = buscarPorId(id);
         if (cita != null) {
-            // Validar que la cita no esté cancelada
+            
             if (cita.getEstado() == EstadoCita.CANCELADA) {
                 throw new Exception("No se puede reprogramar una cita cancelada");
             }
             
-            // Validar que la cita no esté completada
+            
             if (cita.getEstado() == EstadoCita.FINALIZADA) {
                 throw new Exception("No se puede reprogramar una cita completada");
             }
             
-            // Validar que no se cree un duplicado con la nueva fecha
+            
             boolean existeDuplicado = citas.stream()
                 .anyMatch(c -> c.getPaciente().equals(cita.getPaciente()) &&
                               c.getFecha().equals(nuevaFecha) &&
@@ -123,7 +118,7 @@ public class CitaService implements ICitaService {
         return new ArrayList<>(citas);
     }
     
-    // Métodos de validación privados
+    
     private void validarCamposObligatorios(Cita cita) throws Exception {
         if (cita.getPaciente() == null) {
             throw new Exception("El paciente es obligatorio");
