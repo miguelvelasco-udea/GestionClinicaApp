@@ -45,5 +45,6 @@ Permite realizar operaciones **CRUD** sobre los principales actores del sistema:
 ---
 
 
+<img width="1497" height="1110" alt="DiagramaClasesClinica drawio" src="https://github.com/user-attachments/assets/703cdd08-e25a-478e-9e39-087d95670735" />
 
 
