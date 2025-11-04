@@ -2,10 +2,12 @@ package com.clinica.view;
 
 import com.clinica.service.*;
 import com.clinica.view.panels.*;
+import com.clinica.view.listeners.DataChangeListener;
+
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements DataChangeListener {
     private JTabbedPane tabbedPane;
     private PacienteService pacienteService;
     private MedicoService medicoService;
@@ -40,8 +42,8 @@ public class MainFrame extends JFrame {
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
         // Inyectar servicios en los paneles
-        tabbedPane.addTab("👥 Pacientes", new PatientPanel(pacienteService));
-        tabbedPane.addTab("👨‍⚕️ Médicos", new DoctorPanel(medicoService));
+        tabbedPane.addTab("👥 Pacientes", new PatientPanel(pacienteService, this));
+        tabbedPane.addTab("👨‍⚕️ Médicos", new DoctorPanel(medicoService, this));
         tabbedPane.addTab("🎓 Especialidades", new SpecialityPanel());
         tabbedPane.addTab("📅 Citas", new AppointmentPanel(citaService, pacienteService, medicoService));
         tabbedPane.addTab("📋 Historial", new HistoryPanel(historiaService));  
@@ -50,6 +52,12 @@ public class MainFrame extends JFrame {
         mainPanel.add(createStatusBar(), BorderLayout.SOUTH);
         
         setContentPane(mainPanel);
+    }
+
+    @Override
+    public void onDataChanged() {
+        AppointmentPanel appointmentPanel = (AppointmentPanel) tabbedPane.getComponentAt(3);
+        appointmentPanel.loadDoctorsAndPatients();
     }
     
     private JPanel createHeaderPanel() {

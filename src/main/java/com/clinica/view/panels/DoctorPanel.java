@@ -3,6 +3,8 @@ package com.clinica.view.panels;
 import com.clinica.model.Medico;
 import com.clinica.service.MedicoService;
 import com.clinica.view.dialogs.AddDoctorDialog;
+import com.clinica.view.dialogs.EditDoctorDialog;
+import com.clinica.view.listeners.DataChangeListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,9 +16,11 @@ public class DoctorPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JComboBox<String> specialityComboBox;
     private MedicoService medicoService;
+    private DataChangeListener listener;
     
-    public DoctorPanel(MedicoService medicoService) {
+    public DoctorPanel(MedicoService medicoService, DataChangeListener listener) {
         this.medicoService = medicoService;
+        this.listener = listener;
         initializePanel();
         loadDoctorsData();
     }
@@ -132,13 +136,26 @@ public class DoctorPanel extends JPanel {
         AddDoctorDialog dialog = new AddDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService);
         dialog.setVisible(true);
         loadDoctorsData(); // Recargar la tabla
+        listener.onDataChanged();
     }
     
     private void editDoctor() {
         int selectedRow = doctorTable.getSelectedRow();
         if (selectedRow >= 0) {
             String documento = (String) tableModel.getValueAt(selectedRow, 0);
-            JOptionPane.showMessageDialog(this, "Editar médico: " + documento);
+            try {
+                Medico medico = medicoService.buscarPorDocumento(documento);
+                if (medico != null) {
+                    EditDoctorDialog dialog = new EditDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService, medico);
+                    dialog.setVisible(true);
+                    loadDoctorsData(); // Recargar la tabla
+                    listener.onDataChanged();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el médico");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al buscar el médico: " + e.getMessage());
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Seleccione un médico para editar");
         }
@@ -156,6 +173,7 @@ public class DoctorPanel extends JPanel {
                 try {
                     medicoService.eliminarMedico(documento);
                     loadDoctorsData();
+                    listener.onDataChanged();
                     JOptionPane.showMessageDialog(this, "Médico eliminado");
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());

@@ -3,6 +3,8 @@ package com.clinica.view.panels;
 import com.clinica.model.Paciente;
 import com.clinica.service.PacienteService;
 import com.clinica.view.dialogs.AddPatientDialog;
+import com.clinica.view.dialogs.EditPatientDialog;
+import com.clinica.view.listeners.DataChangeListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,9 +17,11 @@ public class PatientPanel extends JPanel {
     private JTextField searchField;
     private JButton addButton, editButton, deleteButton, searchButton;
     private PacienteService pacienteService;
+    private DataChangeListener listener;
     
-    public PatientPanel(PacienteService pacienteService) {
+    public PatientPanel(PacienteService pacienteService, DataChangeListener listener) {
         this.pacienteService = pacienteService;
+        this.listener = listener;
         initializePanel();
         loadPatientsData();
     }
@@ -138,14 +142,26 @@ public class PatientPanel extends JPanel {
         AddPatientDialog dialog = new AddPatientDialog((Frame) SwingUtilities.getWindowAncestor(this), pacienteService);
         dialog.setVisible(true);
         loadPatientsData(); // Recargar la tabla
+        listener.onDataChanged();
     }
     
     private void editPatient() {
         int selectedRow = patientTable.getSelectedRow();
         if (selectedRow >= 0) {
             String documento = (String) tableModel.getValueAt(selectedRow, 0);
-            JOptionPane.showMessageDialog(this, 
-                "Editar paciente con documento: " + documento + " - Por implementar");
+            try {
+                Paciente paciente = pacienteService.buscarPorDocumento(documento);
+                if (paciente != null) {
+                    EditPatientDialog dialog = new EditPatientDialog((Frame) SwingUtilities.getWindowAncestor(this), pacienteService, paciente);
+                    dialog.setVisible(true);
+                    loadPatientsData(); // Recargar la tabla
+                    listener.onDataChanged();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el paciente");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al buscar el paciente: " + e.getMessage());
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Seleccione un paciente para editar");
         }
@@ -163,6 +179,7 @@ public class PatientPanel extends JPanel {
                 try {
                     pacienteService.eliminarPaciente(documento);
                     loadPatientsData();
+                    listener.onDataChanged();
                     JOptionPane.showMessageDialog(this, "Paciente eliminado exitosamente");
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Error al eliminar paciente: " + e.getMessage());

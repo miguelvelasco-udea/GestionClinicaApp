@@ -97,7 +97,7 @@ public class AppointmentPanel extends JPanel {
         return buttonPanel;
     }
     
-    private void loadDoctorsAndPatients() {
+    public void loadDoctorsAndPatients() {
         try {
             // Cargar médicos
             List<Medico> medicos = medicoService.listarMedicos();
