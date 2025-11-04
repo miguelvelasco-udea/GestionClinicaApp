@@ -2,6 +2,8 @@ package com.clinica.view.panels;
 
 import com.clinica.model.Medico;
 import com.clinica.service.MedicoService;
+import com.clinica.view.dialogs.AddDoctorDialog;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -127,7 +129,9 @@ public class DoctorPanel extends JPanel {
     }
     
     private void addDoctor() {
-        JOptionPane.showMessageDialog(this, "Agregar médico - Por implementar con formulario");
+        AddDoctorDialog dialog = new AddDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService);
+        dialog.setVisible(true);
+        loadDoctorsData(); // Recargar la tabla
     }
     
     private void editDoctor() {

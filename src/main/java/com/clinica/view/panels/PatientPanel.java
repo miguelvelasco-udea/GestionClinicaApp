@@ -2,6 +2,8 @@ package com.clinica.view.panels;
 
 import com.clinica.model.Paciente;
 import com.clinica.service.PacienteService;
+import com.clinica.view.dialogs.AddPatientDialog;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -133,9 +135,9 @@ public class PatientPanel extends JPanel {
     }
     
     private void addPatient() {
-        // Diálogo para agregar paciente (implementar después)
-        JOptionPane.showMessageDialog(this, 
-            "Funcionalidad de agregar paciente - Por implementar con formulario completo");
+        AddPatientDialog dialog = new AddPatientDialog((Frame) SwingUtilities.getWindowAncestor(this), pacienteService);
+        dialog.setVisible(true);
+        loadPatientsData(); // Recargar la tabla
     }
     
     private void editPatient() {
