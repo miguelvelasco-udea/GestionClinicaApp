@@ -19,6 +19,25 @@ public class CitaDAO {
 
     private final String archivo = "citas.txt";
 
+    public CitaDAO() {
+        crearArchivoSiNoExiste();
+    }
+
+    private void crearArchivoSiNoExiste() {
+        try {
+            File f = new File(archivo);
+            if (f.getParentFile() != null && !f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
+            if (!f.exists()) {
+                f.createNewFile();
+                System.out.println("Archivo de citas creado: " + f.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("Error al crear archivo de citas: " + e.getMessage());
+        }
+    }
+
     // Agrega una cita
     public void agregarCita(Cita cita) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {

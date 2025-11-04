@@ -10,6 +10,25 @@ public class PacienteDAO {
 
     private final String archivo = "pacientes.txt";
 
+    public PacienteDAO() {
+        crearArchivoSiNoExiste();
+    }
+
+    private void crearArchivoSiNoExiste() {
+        try {
+            File f = new File(archivo);
+            if (f.getParentFile() != null && !f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
+            if (!f.exists()) {
+                f.createNewFile();
+                System.out.println("Archivo de pacientes creado: " + f.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("Error al crear archivo de pacientes: " + e.getMessage());
+        }
+    }
+
     // Agregar paciente
     public void agregarPaciente(Paciente p) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {

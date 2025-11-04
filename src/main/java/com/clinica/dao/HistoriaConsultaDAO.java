@@ -15,6 +15,25 @@ public class HistoriaConsultaDAO {
     private final String archivo = "historias_consulta.txt";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    public HistoriaConsultaDAO() {
+        crearArchivoSiNoExiste();
+    }
+
+    private void crearArchivoSiNoExiste() {
+        try {
+            File f = new File(archivo);
+            if (f.getParentFile() != null && !f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
+            if (!f.exists()) {
+                f.createNewFile();
+                System.out.println("Archivo de historias de consulta creado: " + f.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("Error al crear archivo de historias de consulta: " + e.getMessage());
+        }
+    }
+
     // Guardar historia clínica
     public void guardarHistoriaConsulta(HistoriaConsulta historia) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {

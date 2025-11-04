@@ -1,11 +1,15 @@
 package com.clinica.service;
 
+import com.clinica.dao.PacienteDAO;
 import com.clinica.model.Paciente;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PacienteService implements IPacienteService{
-    private List<Paciente> pacientes = new ArrayList<>();
+    private PacienteDAO pacienteDAO;
+
+    public PacienteService() {
+        this.pacienteDAO = new PacienteDAO();
+    }
 
     @Override
     public Paciente registrarPaciente(Paciente paciente) throws Exception {
@@ -15,43 +19,37 @@ public class PacienteService implements IPacienteService{
         if (paciente.getDocumento() == null || paciente.getDocumento().isEmpty()) {
             throw new Exception("El documento del paciente es obligatorio.");
         }
-          for (Paciente p : pacientes) {
-            if (p.getDocumento().equals(paciente.getDocumento())) {
-                throw new Exception("Ya existe un paciente con ese documento.");
-            }
+        // Check for existing patient by document
+        if (pacienteDAO.obtenerPacientes().stream().anyMatch(p -> p.getDocumento().equals(paciente.getDocumento()))) {
+            throw new Exception("Ya existe un paciente con ese documento.");
         }
-        pacientes.add(paciente);
+        pacienteDAO.agregarPaciente(paciente);
         return paciente;
     }
 
-        @Override
+    @Override
     public Paciente actualizarPaciente(Paciente paciente) throws Exception {
         if (paciente == null || paciente.getDocumento() == null || paciente.getDocumento().isEmpty()) {
             throw new Exception("Datos del paciente inválidos.");
         }
-
-        for (int i = 0; i < pacientes.size(); i++) {
-            if (pacientes.get(i).getDocumento().equals(paciente.getDocumento())) {
-                pacientes.set(i, paciente);
-                return paciente;
-            }
+        if (pacienteDAO.obtenerPacientes().stream().noneMatch(p -> p.getDocumento().equals(paciente.getDocumento()))) {
+            throw new Exception("No se encontró el paciente para actualizar.");
         }
-
-        throw new Exception("No se encontró el paciente para actualizar.");
+        pacienteDAO.actualizarPaciente(paciente);
+        return paciente;
     }
 
     @Override
-    public void eliminarPaciente(String documento) throws Exception { // Cambiado a String
-        boolean eliminado = pacientes.removeIf(p -> p.getDocumento().equals(documento));
-        if (!eliminado) {
+    public void eliminarPaciente(String documento) throws Exception {
+        if (pacienteDAO.obtenerPacientes().stream().noneMatch(p -> p.getDocumento().equals(documento))) {
             throw new Exception("No se encontró el paciente con documento: " + documento);
+        }
+        pacienteDAO.eliminarPaciente(documento);
     }
-}
     
-
     @Override
     public Paciente buscarPorDocumento(String documento) {
-        return pacientes.stream()
+        return pacienteDAO.obtenerPacientes().stream()
                 .filter(p -> p.getDocumento().equals(documento))
                 .findFirst()
                 .orElse(null);
@@ -59,6 +57,6 @@ public class PacienteService implements IPacienteService{
 
     @Override
     public List<Paciente> listarPacientes() {
-        return new ArrayList<>(pacientes);
+        return pacienteDAO.obtenerPacientes();
     }
-}   
+}

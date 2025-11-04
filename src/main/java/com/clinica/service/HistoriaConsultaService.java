@@ -1,12 +1,16 @@
 package com.clinica.service;
 
+import com.clinica.dao.HistoriaConsultaDAO;
 import com.clinica.model.HistoriaConsulta;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HistoriaConsultaService implements IHistoriaConsultaService {
-    private List<HistoriaConsulta> historias = new ArrayList<>();
-    private int contadorId = 1;
+    private HistoriaConsultaDAO historiaConsultaDAO;
+
+    public HistoriaConsultaService() {
+        this.historiaConsultaDAO = new HistoriaConsultaDAO();
+    }
 
     @Override
     public HistoriaConsulta registrarHistoriaConsulta(HistoriaConsulta historia) throws Exception {
@@ -23,12 +27,11 @@ public class HistoriaConsultaService implements IHistoriaConsultaService {
         }
         
         // Verificar si ya existe una historia para esta cita
-        if (buscarPorCita(historia.getCita().getId()) != null) {
+        if (historiaConsultaDAO.obtenerHistoriasConsulta().stream().anyMatch(h -> h.getCita().getId() == historia.getCita().getId())) {
             throw new Exception("Ya existe una historia clínica para esta cita");
         }
         
-        historia.setId(contadorId++);
-        historias.add(historia);
+        historiaConsultaDAO.guardarHistoriaConsulta(historia);
         return historia;
     }
 
@@ -38,14 +41,11 @@ public class HistoriaConsultaService implements IHistoriaConsultaService {
             throw new Exception("Historia clínica inválida");
         }
         
-        for (int i = 0; i < historias.size(); i++) {
-            if (historias.get(i).getId() == historia.getId()) {
-                historias.set(i, historia);
-                return historia;
-            }
+        if (historiaConsultaDAO.obtenerHistoriasConsulta().stream().noneMatch(h -> h.getId() == historia.getId())) {
+            throw new Exception("Historia clínica no encontrada con ID: " + historia.getId());
         }
-        
-        throw new Exception("Historia clínica no encontrada con ID: " + historia.getId());
+        historiaConsultaDAO.actualizarHistoriaConsulta(historia);
+        return historia;
     }
 
     @Override
@@ -54,15 +54,15 @@ public class HistoriaConsultaService implements IHistoriaConsultaService {
             throw new Exception("ID de historia clínica inválido");
         }
         
-        boolean eliminado = historias.removeIf(h -> h.getId() == id);
-        if (!eliminado) {
+        if (historiaConsultaDAO.obtenerHistoriasConsulta().stream().noneMatch(h -> h.getId() == id)) {
             throw new Exception("Historia clínica no encontrada con ID: " + id);
         }
+        historiaConsultaDAO.eliminarHistoriaConsulta(id);
     }
 
     @Override
     public HistoriaConsulta buscarPorId(int id) {
-        return historias.stream()
+        return historiaConsultaDAO.obtenerHistoriasConsulta().stream()
                 .filter(h -> h.getId() == id)
                 .findFirst()
                 .orElse(null);
@@ -70,34 +70,26 @@ public class HistoriaConsultaService implements IHistoriaConsultaService {
 
     @Override
     public List<HistoriaConsulta> listarHistoriasConsulta() {
-        return new ArrayList<>(historias);
+        return historiaConsultaDAO.obtenerHistoriasConsulta();
     }
 
     @Override
     public List<HistoriaConsulta> buscarPorPaciente(String documentoPaciente) {
-        List<HistoriaConsulta> resultado = new ArrayList<>();
-        for (HistoriaConsulta historia : historias) {
-            if (historia.getCita().getPaciente().getDocumento().equals(documentoPaciente)) {
-                resultado.add(historia);
-            }
-        }
-        return resultado;
+        return historiaConsultaDAO.obtenerHistoriasConsulta().stream()
+                .filter(h -> h.getCita().getPaciente().getDocumento().equals(documentoPaciente))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<HistoriaConsulta> buscarPorMedico(String documentoMedico) {
-        List<HistoriaConsulta> resultado = new ArrayList<>();
-        for (HistoriaConsulta historia : historias) {
-            if (historia.getCita().getMedico().getDocumento().equals(documentoMedico)) {
-                resultado.add(historia);
-            }
-        }
-        return resultado;
+        return historiaConsultaDAO.obtenerHistoriasConsulta().stream()
+                .filter(h -> h.getCita().getMedico().getDocumento().equals(documentoMedico))
+                .collect(Collectors.toList());
     }
 
     @Override
     public HistoriaConsulta buscarPorCita(int idCita) {
-        return historias.stream()
+        return historiaConsultaDAO.obtenerHistoriasConsulta().stream()
                 .filter(h -> h.getCita().getId() == idCita)
                 .findFirst()
                 .orElse(null);

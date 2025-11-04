@@ -1,12 +1,16 @@
 package com.clinica.service;
 
-
+import com.clinica.dao.MedicoDAO;
 import com.clinica.model.Medico;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MedicoService implements IMedicoService{
-    private List<Medico> medicos = new ArrayList<>();
+    private MedicoDAO medicoDAO;
+
+    public MedicoService() {
+        this.medicoDAO = new MedicoDAO();
+    }
 
     @Override
     public Medico registrarMedico(Medico medico) throws Exception {
@@ -16,13 +20,11 @@ public class MedicoService implements IMedicoService{
         if (medico.getDocumento() == null || medico.getDocumento().isEmpty()) {
             throw new Exception("El documento del médico es obligatorio.");
         }
-        for (Medico m : medicos) {
-            if (m.getDocumento().equals(medico.getDocumento())) {
-                throw new Exception("Ya existe un médico con ese documento.");
-            }
+        if (medicoDAO.obtenerMedicos().stream().anyMatch(m -> m.getDocumento().equals(medico.getDocumento()))) {
+            throw new Exception("Ya existe un médico con ese documento.");
         }
 
-        medicos.add(medico);
+        medicoDAO.agregarMedico(medico);
         return medico;
     }
     @Override
@@ -31,14 +33,11 @@ public class MedicoService implements IMedicoService{
             throw new Exception("Datos del médico inválidos.");
         }
 
-        for (int i = 0; i < medicos.size(); i++) {
-            if (medicos.get(i).getDocumento().equals(medico.getDocumento())) {
-                medicos.set(i, medico);
-                return medico;
-            }
+        if (medicoDAO.obtenerMedicos().stream().noneMatch(m -> m.getDocumento().equals(medico.getDocumento()))) {
+            throw new Exception("No se encontró el médico para actualizar.");
         }
-
-        throw new Exception("No se encontró el médico para actualizar.");
+        medicoDAO.actualizarMedico(medico);
+        return medico;
     }
 
     @Override
@@ -47,10 +46,10 @@ public class MedicoService implements IMedicoService{
             throw new Exception("El documento no puede ser nulo o vacío.");
         }
         
-        boolean eliminado = medicos.removeIf(m -> m.getDocumento().equals(documento));
-        if (!eliminado){
+        if (medicoDAO.obtenerMedicos().stream().noneMatch(m -> m.getDocumento().equals(documento))) {
             throw new Exception("No se encontró el médico para eliminar.");
         }
+        medicoDAO.eliminarMedico(documento);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class MedicoService implements IMedicoService{
             return null;
         }
         
-        return medicos.stream()
+        return medicoDAO.obtenerMedicos().stream()
                 .filter(m -> documento.equals(m.getDocumento()))
                 .findFirst()
                 .orElse(null);
@@ -68,18 +67,14 @@ public class MedicoService implements IMedicoService{
 
     @Override
     public List<Medico> listarMedicos() {
-        return new ArrayList<>(medicos);
+        return medicoDAO.obtenerMedicos();
     }
 
     @Override
     public List<Medico> listarPorEspecialidad(String nombreEspecialidad) {
-        List<Medico> resultado = new ArrayList<>();
-        for (Medico m : medicos) {
-            if (m.getEspecialidad() != null && 
-                m.getEspecialidad().getNombre().equalsIgnoreCase(nombreEspecialidad)) {
-                resultado.add(m);
-            }
-        }
-        return resultado;
+        return medicoDAO.obtenerMedicos().stream()
+                .filter(m -> m.getEspecialidad() != null && 
+                             m.getEspecialidad().getNombre().equalsIgnoreCase(nombreEspecialidad))
+                .collect(Collectors.toList());
     }
 }

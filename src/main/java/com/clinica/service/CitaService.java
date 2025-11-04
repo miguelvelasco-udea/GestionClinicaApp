@@ -1,14 +1,17 @@
 package com.clinica.service;
+import com.clinica.dao.CitaDAO;
 import com.clinica.model.Cita;
 import com.clinica.model.EstadoCita;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CitaService implements ICitaService {
 
-    private List<Cita> citas = new ArrayList<>();
-    private int contadorId = 1;
+    private CitaDAO citaDAO;
+
+    public CitaService() {
+        this.citaDAO = new CitaDAO();
+    }
 
    @Override
     public void crearCita(Cita cita) throws Exception {
@@ -27,8 +30,8 @@ public class CitaService implements ICitaService {
             throw new Exception("No se pueden crear citas en fechas pasadas");
         }
         
-        cita.setId(contadorId++);
-        citas.add(cita);
+        // ID will be handled by DAO if needed, or assigned before calling DAO
+        citaDAO.agregarCita(cita);
     }
     
     @Override
@@ -50,6 +53,7 @@ public class CitaService implements ICitaService {
             }
             
             cita.setEstado(EstadoCita.CANCELADA);
+            citaDAO.actualizarCita(cita);
         } else {
             throw new Exception("Cita no encontrada con ID: " + id);
         }
@@ -84,7 +88,7 @@ public class CitaService implements ICitaService {
             }
             
             
-            boolean existeDuplicado = citas.stream()
+            boolean existeDuplicado = citaDAO.obtenerCitas().stream()
                 .anyMatch(c -> c.getPaciente().equals(cita.getPaciente()) &&
                               c.getFecha().equals(nuevaFecha) &&
                               c.getHora().equals(cita.getHora()) &&
@@ -96,6 +100,7 @@ public class CitaService implements ICitaService {
             }
             
             cita.setFecha(nuevaFecha);
+            citaDAO.actualizarCita(cita);
         } else {
             throw new Exception("Cita no encontrada con ID: " + id);
         }
@@ -107,7 +112,7 @@ public class CitaService implements ICitaService {
             return null;
         }
         
-        return citas.stream()
+        return citaDAO.obtenerCitas().stream()
                     .filter(c -> c.getId() == id)
                     .findFirst()
                     .orElse(null);
@@ -115,7 +120,7 @@ public class CitaService implements ICitaService {
 
     @Override 
     public List<Cita> listarCitas() {
-        return new ArrayList<>(citas);
+        return citaDAO.obtenerCitas();
     }
     
     
@@ -138,7 +143,7 @@ public class CitaService implements ICitaService {
     }
     
     private boolean existeCitaDuplicada(Cita cita) {
-        return citas.stream()
+        return citaDAO.obtenerCitas().stream()
                    .anyMatch(c -> c.getPaciente().equals(cita.getPaciente()) &&
                                  c.getFecha().equals(cita.getFecha()) &&
                                  c.getHora().equals(cita.getHora()) &&
