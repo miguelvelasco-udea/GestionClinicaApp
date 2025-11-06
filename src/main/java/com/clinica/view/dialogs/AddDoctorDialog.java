@@ -6,16 +6,19 @@ import com.clinica.service.MedicoService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class AddDoctorDialog extends JDialog {
     private JTextField documentoField, nombreField, apellidoField, emailField, telefonoField;
-    private JComboBox<String> especialidadComboBox;
+    private JComboBox<Especialidad> especialidadComboBox;
     private JButton guardarButton, cancelButton;
     private MedicoService medicoService;
+    private List<Especialidad> especialidades;
 
-    public AddDoctorDialog(Frame owner, MedicoService medicoService) {
+    public AddDoctorDialog(Frame owner, MedicoService medicoService, List<Especialidad> especialidades) {
         super(owner, "Agregar Médico", true);
         this.medicoService = medicoService;
+        this.especialidades = especialidades;
         initializeUI();
     }
 
@@ -53,7 +56,7 @@ public class AddDoctorDialog extends JDialog {
         formPanel.add(telefonoField);
 
         formPanel.add(new JLabel("Especialidad:"));
-        especialidadComboBox = new JComboBox<>(new String[]{"Cardiología", "Pediatría", "Dermatología", "Neurología"});
+        especialidadComboBox = new JComboBox<>(especialidades.toArray(new Especialidad[0]));
         formPanel.add(especialidadComboBox);
 
         return formPanel;
@@ -79,8 +82,7 @@ public class AddDoctorDialog extends JDialog {
             String apellido = apellidoField.getText();
             String email = emailField.getText();
             String telefono = telefonoField.getText();
-            String especialidadNombre = (String) especialidadComboBox.getSelectedItem();
-            Especialidad especialidad = new Especialidad(0, especialidadNombre, ""); // ID and description are not used here
+            Especialidad especialidad = (Especialidad) especialidadComboBox.getSelectedItem();
 
             Medico newDoctor = new Medico(documento, nombre, apellido, email, telefono, especialidad);
             medicoService.registrarMedico(newDoctor);

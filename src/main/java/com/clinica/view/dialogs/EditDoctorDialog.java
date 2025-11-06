@@ -6,18 +6,21 @@ import com.clinica.service.MedicoService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class EditDoctorDialog extends JDialog {
     private JTextField documentoField, nombreField, apellidoField, emailField, telefonoField;
-    private JComboBox<String> especialidadComboBox;
+    private JComboBox<Especialidad> especialidadComboBox;
     private JButton guardarButton, cancelButton;
     private MedicoService medicoService;
     private Medico medico;
+    private List<Especialidad> especialidades;
 
-    public EditDoctorDialog(Frame owner, MedicoService medicoService, Medico medico) {
+    public EditDoctorDialog(Frame owner, MedicoService medicoService, Medico medico, List<Especialidad> especialidades) {
         super(owner, "Editar Médico", true);
         this.medicoService = medicoService;
         this.medico = medico;
+        this.especialidades = especialidades;
         initializeUI();
         fillData();
     }
@@ -57,7 +60,7 @@ public class EditDoctorDialog extends JDialog {
         formPanel.add(telefonoField);
 
         formPanel.add(new JLabel("Especialidad:"));
-        especialidadComboBox = new JComboBox<>(new String[]{"Cardiología", "Pediatría", "Dermatología", "Neurología"});
+        especialidadComboBox = new JComboBox<>(especialidades.toArray(new Especialidad[0]));
         formPanel.add(especialidadComboBox);
 
         return formPanel;
@@ -69,7 +72,7 @@ public class EditDoctorDialog extends JDialog {
         apellidoField.setText(medico.getApellido());
         emailField.setText(medico.getEmail());
         telefonoField.setText(medico.getTelefono());
-        especialidadComboBox.setSelectedItem(medico.getEspecialidad().getNombre());
+        especialidadComboBox.setSelectedItem(medico.getEspecialidad());
     }
 
     private JPanel createButtonPanel() {
@@ -91,8 +94,7 @@ public class EditDoctorDialog extends JDialog {
             medico.setApellido(apellidoField.getText());
             medico.setEmail(emailField.getText());
             medico.setTelefono(telefonoField.getText());
-            String especialidadNombre = (String) especialidadComboBox.getSelectedItem();
-            Especialidad especialidad = new Especialidad(0, especialidadNombre, ""); // ID and description are not used here
+            Especialidad especialidad = (Especialidad) especialidadComboBox.getSelectedItem();
             medico.setEspecialidad(especialidad);
 
             medicoService.actualizarMedico(medico);

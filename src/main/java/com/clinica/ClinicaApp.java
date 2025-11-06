@@ -10,8 +10,9 @@ public class ClinicaApp {
         PacienteService pacienteService = new PacienteService();
         MedicoService medicoService = new MedicoService();
         CitaService citaService = new CitaService();
-        HistoriaConsultaService historiaService = new HistoriaConsultaService(); 
-        
+        HistoriaConsultaService historiaService = new HistoriaConsultaService();
+        EspecialidadService especialidadService = new EspecialidadService();
+
         SwingUtilities.invokeLater(() -> {
             try {
                 // Look and feel profesional
@@ -19,9 +20,9 @@ public class ClinicaApp {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             // Crear y mostrar la ventana principal
-            MainFrame mainFrame = new MainFrame(pacienteService, medicoService, citaService, historiaService);
+            MainFrame mainFrame = new MainFrame(pacienteService, medicoService, citaService, historiaService, especialidadService);
             mainFrame.setVisible(true);
         });
     }

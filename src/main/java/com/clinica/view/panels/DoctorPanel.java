@@ -1,6 +1,8 @@
 package com.clinica.view.panels;
 
+import com.clinica.model.Especialidad;
 import com.clinica.model.Medico;
+import com.clinica.service.EspecialidadService;
 import com.clinica.service.MedicoService;
 import com.clinica.view.dialogs.AddDoctorDialog;
 import com.clinica.view.dialogs.EditDoctorDialog;
@@ -14,85 +16,98 @@ import java.util.List;
 public class DoctorPanel extends JPanel {
     private JTable doctorTable;
     private DefaultTableModel tableModel;
-    private JComboBox<String> specialityComboBox;
+    private JComboBox<Especialidad> specialityComboBox;
     private MedicoService medicoService;
+    private EspecialidadService especialidadService;
     private DataChangeListener listener;
-    
-    public DoctorPanel(MedicoService medicoService, DataChangeListener listener) {
+
+    public DoctorPanel(MedicoService medicoService, EspecialidadService especialidadService, DataChangeListener listener) {
         this.medicoService = medicoService;
+        this.especialidadService = especialidadService;
         this.listener = listener;
         initializePanel();
         loadDoctorsData();
+        loadSpecialities();
     }
-    
+
     private void initializePanel() {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setBackground(new Color(245, 245, 245));
-        
+
         add(createFilterPanel(), BorderLayout.NORTH);
         add(createTablePanel(), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
     }
-    
+
     private JPanel createFilterPanel() {
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.setBorder(BorderFactory.createTitledBorder("🎯 Filtros"));
         filterPanel.setBackground(Color.WHITE);
-        
-        specialityComboBox = new JComboBox<>(new String[]{
-            "Todas las especialidades", "Cardiología", "Pediatría", "Dermatología", "Neurología"
-        });
-        
+
+        specialityComboBox = new JComboBox<>();
+
         JButton filterButton = new JButton("Filtrar");
         filterButton.addActionListener(e -> filterDoctors());
-        
+
         filterPanel.add(new JLabel("Especialidad:"));
         filterPanel.add(specialityComboBox);
         filterPanel.add(filterButton);
-        
+
         return filterPanel;
     }
-    
+
+    private void loadSpecialities() {
+        try {
+            List<Especialidad> especialidades = especialidadService.listarEspecialidades();
+            specialityComboBox.addItem(new Especialidad(0, "Todas las especialidades", ""));
+            for (Especialidad especialidad : especialidades) {
+                specialityComboBox.addItem(especialidad);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar especialidades: " + e.getMessage());
+        }
+    }
+
     private JPanel createTablePanel() {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createTitledBorder("👨‍⚕️ Cuerpo Médico"));
         tablePanel.setBackground(Color.WHITE);
-        
+
         String[] columnNames = {"Documento", "Nombre", "Apellido", "Email", "Teléfono", "Especialidad"};
         tableModel = new DefaultTableModel(columnNames, 0);
         doctorTable = new JTable(tableModel);
-        
+
         // Estilo de tabla
         doctorTable.getTableHeader().setBackground(new Color(70, 130, 180));
         doctorTable.getTableHeader().setForeground(Color.WHITE);
         doctorTable.setRowHeight(25);
-        
+
         JScrollPane scrollPane = new JScrollPane(doctorTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
-        
+
         return tablePanel;
     }
-    
+
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(245, 245, 245));
-        
+
         JButton addButton = new JButton("Agregar Médico");
         JButton editButton = new JButton("Editar Médico");
         JButton deleteButton = new JButton("Eliminar Médico");
-        
+
         addButton.addActionListener(e -> addDoctor());
         editButton.addActionListener(e -> editDoctor());
         deleteButton.addActionListener(e -> deleteDoctor());
-        
+
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
-        
+
         return buttonPanel;
     }
-    
+
     private void loadDoctorsData() {
         try {
             List<Medico> medicos = medicoService.listarMedicos();
@@ -101,22 +116,22 @@ public class DoctorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Error al cargar médicos: " + e.getMessage());
         }
     }
-    
+
     private void filterDoctors() {
-        String especialidad = (String) specialityComboBox.getSelectedItem();
-        if ("Todas las especialidades".equals(especialidad)) {
+        Especialidad especialidad = (Especialidad) specialityComboBox.getSelectedItem();
+        if (especialidad.getId() == 0) {
             loadDoctorsData();
             return;
         }
-        
+
         try {
-            List<Medico> medicos = medicoService.listarPorEspecialidad(especialidad);
+            List<Medico> medicos = medicoService.listarPorEspecialidad(especialidad.getNombre());
             updateTable(medicos);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al filtrar médicos: " + e.getMessage());
         }
     }
-    
+
     private void updateTable(List<Medico> medicos) {
         tableModel.setRowCount(0);
         for (Medico medico : medicos) {
@@ -131,14 +146,19 @@ public class DoctorPanel extends JPanel {
             tableModel.addRow(row);
         }
     }
-    
+
     private void addDoctor() {
-        AddDoctorDialog dialog = new AddDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService);
-        dialog.setVisible(true);
-        loadDoctorsData(); // Recargar la tabla
-        listener.onDataChanged();
+        try {
+            List<Especialidad> especialidades = especialidadService.listarEspecialidades();
+            AddDoctorDialog dialog = new AddDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService, especialidades);
+            dialog.setVisible(true);
+            loadDoctorsData(); // Recargar la tabla
+            listener.onDataChanged();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar especialidades: " + e.getMessage());
+        }
     }
-    
+
     private void editDoctor() {
         int selectedRow = doctorTable.getSelectedRow();
         if (selectedRow >= 0) {
@@ -146,7 +166,8 @@ public class DoctorPanel extends JPanel {
             try {
                 Medico medico = medicoService.buscarPorDocumento(documento);
                 if (medico != null) {
-                    EditDoctorDialog dialog = new EditDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService, medico);
+                    List<Especialidad> especialidades = especialidadService.listarEspecialidades();
+                    EditDoctorDialog dialog = new EditDoctorDialog((Frame) SwingUtilities.getWindowAncestor(this), medicoService, medico, especialidades);
                     dialog.setVisible(true);
                     loadDoctorsData(); // Recargar la tabla
                     listener.onDataChanged();
@@ -160,7 +181,7 @@ public class DoctorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Seleccione un médico para editar");
         }
     }
-    
+
     private void deleteDoctor() {
         int selectedRow = doctorTable.getSelectedRow();
         if (selectedRow >= 0) {
@@ -168,7 +189,7 @@ public class DoctorPanel extends JPanel {
             int confirm = JOptionPane.showConfirmDialog(this,
                 "¿Eliminar médico con documento: " + documento + "?",
                 "Confirmar", JOptionPane.YES_NO_OPTION);
-                
+
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     medicoService.eliminarMedico(documento);
