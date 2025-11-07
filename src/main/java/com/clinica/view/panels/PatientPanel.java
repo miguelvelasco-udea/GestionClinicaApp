@@ -5,11 +5,10 @@ import com.clinica.service.PacienteService;
 import com.clinica.view.dialogs.AddPatientDialog;
 import com.clinica.view.dialogs.EditPatientDialog;
 import com.clinica.view.listeners.DataChangeListener;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class PatientPanel extends JPanel {
     private JTable patientTable;
@@ -22,11 +21,13 @@ public class PatientPanel extends JPanel {
     public PatientPanel(PacienteService pacienteService, DataChangeListener listener) {
         this.pacienteService = pacienteService;
         this.listener = listener;
+        System.out.println("🆕 DEBUG: PatientPanel CONSTRUCTOR - Servicio: " + (pacienteService != null));
         initializePanel();
         loadPatientsData();
     }
     
     private void initializePanel() {
+        System.out.println("🔧 DEBUG: Inicializando PatientPanel UI");
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setBackground(new Color(245, 245, 245));
@@ -34,6 +35,8 @@ public class PatientPanel extends JPanel {
         add(createSearchPanel(), BorderLayout.NORTH);
         add(createTablePanel(), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
+        
+        System.out.println("✅ DEBUG: PatientPanel UI inicializado");
     }
     
     private JPanel createSearchPanel() {
@@ -54,12 +57,18 @@ public class PatientPanel extends JPanel {
     }
     
     private JPanel createTablePanel() {
+        System.out.println("🔧 DEBUG: Creando tabla de pacientes");
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createTitledBorder("📋 Lista de Pacientes"));
         tablePanel.setBackground(Color.WHITE);
         
         String[] columnNames = {"Documento", "Nombre", "Apellido", "Email", "Teléfono", "Dirección", "Fecha Nac."};
-        tableModel = new DefaultTableModel(columnNames, 0);
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Hacer tabla no editable
+            }
+        };
         patientTable = new JTable(tableModel);
         
         // Estilo de tabla
@@ -70,6 +79,7 @@ public class PatientPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(patientTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         
+        System.out.println("✅ DEBUG: Tabla creada - Columnas: " + columnNames.length);
         return tablePanel;
     }
     
@@ -93,13 +103,43 @@ public class PatientPanel extends JPanel {
     }
     
     private void loadPatientsData() {
-        try {
-            List<Paciente> pacientes = pacienteService.listarPacientes();
-            updateTable(pacientes);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar pacientes: " + e.getMessage());
+    System.out.println("\n=== 🔍 DEBUG PatientPanel: INICIANDO loadPatientsData() ===");
+    try {
+        System.out.println("📋 DEBUG PatientPanel: Llamando a pacienteService.listarPacientes()");
+        
+        List<Paciente> pacientes = pacienteService.listarPacientes();
+        
+        System.out.println("✅ DEBUG PatientPanel: Service devolvió " + pacientes.size() + " pacientes");
+        
+        if (pacientes.isEmpty()) {
+            System.out.println("⚠️ DEBUG PatientPanel: La lista de pacientes está VACÍA");
+            // Verificar el servicio directamente
+            System.out.println("🔍 DEBUG PatientPanel: Verificando servicio...");
+            if (pacienteService == null) {
+                System.out.println("❌ DEBUG PatientPanel: pacienteService es NULL!");
+            } else {
+                System.out.println("✅ DEBUG PatientPanel: pacienteService existe");
+            }
+        } else {
+            for (int i = 0; i < pacientes.size(); i++) {
+                Paciente p = pacientes.get(i);
+                System.out.println("👤 DEBUG PatientPanel Paciente " + i + ": " + 
+                    "Doc='" + p.getDocumento() + "', " +
+                    "Nombre='" + p.getNombre() + "', " +
+                    "Apellido='" + p.getApellido() + "', " +
+                    "Email='" + p.getEmail() + "'");
+            }
         }
+        
+        updateTable(pacientes);
+        
+    } catch (Exception e) {
+        System.err.println("❌ ERROR en loadPatientsData: " + e.getMessage());
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al cargar pacientes: " + e.getMessage());
     }
+    System.out.println("=== 🔍 DEBUG PatientPanel: loadPatientsData() FINALIZADO ===\n");
+}
     
     private void searchPatients() {
         String searchText = searchField.getText().trim();
@@ -110,7 +150,6 @@ public class PatientPanel extends JPanel {
         
         try {
             List<Paciente> pacientes = pacienteService.listarPacientes();
-            // Filtrar localmente (ya que el servicio no tiene búsqueda)
             pacientes.removeIf(p -> 
                 !p.getNombre().toLowerCase().contains(searchText.toLowerCase()) &&
                 !p.getApellido().toLowerCase().contains(searchText.toLowerCase()) &&
@@ -123,7 +162,12 @@ public class PatientPanel extends JPanel {
     }
     
     private void updateTable(List<Paciente> pacientes) {
+        System.out.println("🔄 DEBUG updateTable(): Actualizando con " + pacientes.size() + " pacientes");
+        
+        int filasAntes = tableModel.getRowCount();
         tableModel.setRowCount(0);
+        System.out.println("📊 DEBUG: Tabla limpiada - Filas antes: " + filasAntes + ", después: 0");
+        
         for (Paciente paciente : pacientes) {
             Object[] row = {
                 paciente.getDocumento(),
@@ -135,14 +179,41 @@ public class PatientPanel extends JPanel {
                 paciente.getFechaNacimiento()
             };
             tableModel.addRow(row);
+            System.out.println("➕ DEBUG: Fila agregada - " + paciente.getNombre() + " " + paciente.getApellido());
         }
+        
+        System.out.println("📊 DEBUG: Tabla actualizada - Total filas ahora: " + tableModel.getRowCount());
+        
+        // Forzar actualización visual
+        tableModel.fireTableDataChanged();
+        patientTable.repaint();
+        System.out.println("🎨 DEBUG: Actualización visual forzada");
     }
     
     private void addPatient() {
-        AddPatientDialog dialog = new AddPatientDialog((Frame) SwingUtilities.getWindowAncestor(this), pacienteService);
+        System.out.println("\n🎯 DEBUG: Botón 'Agregar Paciente' clickeado");
+        
+        AddPatientDialog dialog = new AddPatientDialog(
+            (Frame) SwingUtilities.getWindowAncestor(this), 
+            pacienteService,
+            () -> {
+                System.out.println("🔄 DEBUG: Callback ejecutado desde diálogo");
+                // Ejecutar en el hilo de Swing
+                SwingUtilities.invokeLater(() -> {
+                    System.out.println("🔄 DEBUG: Recargando datos en Swing Thread");
+                    loadPatientsData();
+                    this.revalidate();
+                    this.repaint();
+                });
+            }
+        );
         dialog.setVisible(true);
-        loadPatientsData(); // Recargar la tabla
-        listener.onDataChanged();
+        
+        if (listener != null) {
+            listener.onDataChanged();
+        }
+        
+        System.out.println("✅ DEBUG: Diálogo cerrado\n");
     }
     
     private void editPatient() {
@@ -152,10 +223,21 @@ public class PatientPanel extends JPanel {
             try {
                 Paciente paciente = pacienteService.buscarPorDocumento(documento);
                 if (paciente != null) {
-                    EditPatientDialog dialog = new EditPatientDialog((Frame) SwingUtilities.getWindowAncestor(this), pacienteService, paciente);
+                    EditPatientDialog dialog = new EditPatientDialog(
+                        (Frame) SwingUtilities.getWindowAncestor(this), 
+                        pacienteService, 
+                        paciente,
+                        () -> {
+                            SwingUtilities.invokeLater(() -> {
+                                loadPatientsData();
+                                repaint();
+                            });
+                        }
+                    );
                     dialog.setVisible(true);
-                    loadPatientsData(); // Recargar la tabla
-                    listener.onDataChanged();
+                    if (listener != null) {
+                        listener.onDataChanged();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(this, "No se encontró el paciente");
                 }
@@ -179,7 +261,9 @@ public class PatientPanel extends JPanel {
                 try {
                     pacienteService.eliminarPaciente(documento);
                     loadPatientsData();
-                    listener.onDataChanged();
+                    if (listener != null) {
+                        listener.onDataChanged();
+                    }
                     JOptionPane.showMessageDialog(this, "Paciente eliminado exitosamente");
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Error al eliminar paciente: " + e.getMessage());
@@ -189,4 +273,22 @@ public class PatientPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Seleccione un paciente para eliminar");
         }
     }
+
+    private void initializePanel() {
+    // ... tu código actual ...
+    
+    // ✅ VERIFICAR VISIBILIDAD Y TAMAÑO
+    System.out.println("🔍 DEBUG: Verificando visibilidad del panel:");
+    System.out.println("   - Visible: " + this.isVisible());
+    System.out.println("   - Tamaño: " + this.getSize());
+    System.out.println("   - Preferido: " + this.getPreferredSize());
+    
+    if (patientTable != null) {
+        System.out.println("🔍 DEBUG: Verificando tabla:");
+        System.out.println("   - Tabla visible: " + patientTable.isVisible());
+        System.out.println("   - Tabla tamaño: " + patientTable.getSize());
+        System.out.println("   - Filas en modelo: " + tableModel.getRowCount());
+        System.out.println("   - Columnas en modelo: " + tableModel.getColumnCount());
+    }
+}
 }

@@ -2,11 +2,10 @@ package com.clinica.view.dialogs;
 
 import com.clinica.model.Paciente;
 import com.clinica.service.PacienteService;
-
-import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Calendar;
+import javax.swing.*;
 
 public class EditPatientDialog extends JDialog {
     private JTextField documentoField, nombreField, apellidoField, emailField, telefonoField, direccionField, historialMedicoField;
@@ -14,15 +13,24 @@ public class EditPatientDialog extends JDialog {
     private JButton guardarButton, cancelButton;
     private PacienteService pacienteService;
     private Paciente paciente;
+    private Runnable onPatientUpdated; // ✅ NUEVO: Callback para actualizar
 
-    public EditPatientDialog(Frame owner, PacienteService pacienteService, Paciente paciente) {
+    // ✅ MODIFICADO: Constructor con callback
+    public EditPatientDialog(Frame owner, PacienteService pacienteService, Paciente paciente, Runnable onPatientUpdated) {
         super(owner, "Editar Paciente", true);
         this.pacienteService = pacienteService;
         this.paciente = paciente;
+        this.onPatientUpdated = onPatientUpdated; // ✅ NUEVO: Recibir callback
         initializeUI();
         fillData();
     }
 
+    // ✅ NUEVO: Constructor antiguo para compatibilidad
+    public EditPatientDialog(Frame owner, PacienteService pacienteService, Paciente paciente) {
+        this(owner, pacienteService, paciente, null);
+    }
+
+    // El resto de tu código se mantiene IGUAL...
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
         setSize(400, 500);
@@ -127,6 +135,12 @@ public class EditPatientDialog extends JDialog {
             pacienteService.actualizarPaciente(paciente);
 
             JOptionPane.showMessageDialog(this, "Paciente actualizado exitosamente");
+            
+            // ✅ NUEVO: ACTUALIZAR LA LISTA EN LA VENTANA PRINCIPAL
+            if (onPatientUpdated != null) {
+                onPatientUpdated.run(); // Esto actualiza la tabla
+            }
+            
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el paciente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

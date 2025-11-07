@@ -2,22 +2,29 @@ package com.clinica.view.dialogs;
 
 import com.clinica.model.Paciente;
 import com.clinica.service.PacienteService;
-
-import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Calendar;
+import javax.swing.*;
 
 public class AddPatientDialog extends JDialog {
     private JTextField documentoField, nombreField, apellidoField, emailField, telefonoField, direccionField, historialMedicoField;
     private JComboBox<Integer> diaComboBox, mesComboBox, anioComboBox;
     private JButton guardarButton, cancelButton;
     private PacienteService pacienteService;
+    private Runnable onPatientAdded; // Callback para actualizar la lista
 
-    public AddPatientDialog(Frame owner, PacienteService pacienteService) {
+    // Constructor modificado
+    public AddPatientDialog(Frame owner, PacienteService pacienteService, Runnable onPatientAdded) {
         super(owner, "Agregar Paciente", true);
         this.pacienteService = pacienteService;
+        this.onPatientAdded = onPatientAdded; // Recibimos el callback
         initializeUI();
+    }
+
+    // Constructor antiguo para compatibilidad
+    public AddPatientDialog(Frame owner, PacienteService pacienteService) {
+        this(owner, pacienteService, null);
     }
 
     private void initializeUI() {
@@ -93,22 +100,37 @@ public class AddPatientDialog extends JDialog {
 
     private void savePatient() {
         try {
-            String documento = documentoField.getText();
-            String nombre = nombreField.getText();
-            String apellido = apellidoField.getText();
-            String email = emailField.getText();
-            String telefono = telefonoField.getText();
-            String direccion = direccionField.getText();
+            String documento = documentoField.getText().trim();
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String email = emailField.getText().trim();
+            String telefono = telefonoField.getText().trim();
+            String direccion = direccionField.getText().trim();
             int dia = (int) diaComboBox.getSelectedItem();
             int mes = (int) mesComboBox.getSelectedItem();
             int anio = (int) anioComboBox.getSelectedItem();
             LocalDate fechaNacimiento = LocalDate.of(anio, mes, dia);
-            String historialMedico = historialMedicoField.getText();
+            String historialMedico = historialMedicoField.getText().trim();
+
+            // ✅ Validar campos obligatorios
+            if (documento.isEmpty() || nombre.isEmpty() || apellido.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Documento, nombre y apellido son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            System.out.println("DEBUG Dialog: Creando paciente - " + nombre + " " + apellido);
 
             Paciente newPatient = new Paciente(documento, nombre, apellido, email, telefono, direccion, fechaNacimiento, historialMedico);
             pacienteService.registrarPaciente(newPatient);
 
             JOptionPane.showMessageDialog(this, "Paciente agregado exitosamente");
+            
+            // ✅ ACTUALIZAR LA LISTA EN LA VENTANA PRINCIPAL
+            if (onPatientAdded != null) {
+                System.out.println("DEBUG Dialog: Ejecutando callback para actualizar tabla");
+                onPatientAdded.run(); // Esto actualiza la lista
+            }
+            
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el paciente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
