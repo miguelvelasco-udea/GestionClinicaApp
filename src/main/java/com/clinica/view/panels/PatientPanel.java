@@ -275,7 +275,6 @@ public class PatientPanel extends JPanel {
     }
 
     private void initializePanel() {
-    // ... tu código actual ...
     
     // ✅ VERIFICAR VISIBILIDAD Y TAMAÑO
     System.out.println("🔍 DEBUG: Verificando visibilidad del panel:");

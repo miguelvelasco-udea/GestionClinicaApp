@@ -40,6 +40,7 @@ public class CitaDAO {
 
     // Agrega una cita
     public void agregarCita(Cita cita) {
+        cita.setId(generarNuevoId());
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {
             bw.write(formatearCita(cita));
             bw.newLine();
@@ -106,6 +107,15 @@ public class CitaDAO {
         citas.removeIf(c -> c.getId() == id);
         guardarTodas(citas);
     }
+
+    // nuevo
+    private int generarNuevoId() {
+        return obtenerCitas().stream()
+            .mapToInt(Cita::getId)
+            .max()
+            .orElse(0) + 1;
+}
+
 
     // Guarda todas las citas (reescribe el archivo)
     private void guardarTodas(List<Cita> citas) {

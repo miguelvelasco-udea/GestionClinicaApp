@@ -12,7 +12,6 @@ public class MainFrame extends JFrame implements DataChangeListener {
     private PacienteService pacienteService;
     private MedicoService medicoService;
     private CitaService citaService;
-    private HistoriaConsultaService historiaService;  
     private EspecialidadService especialidadService;
     
     public MainFrame(PacienteService pacienteService, MedicoService medicoService, 
@@ -20,7 +19,6 @@ public class MainFrame extends JFrame implements DataChangeListener {
         this.pacienteService = pacienteService;
         this.medicoService = medicoService;
         this.citaService = citaService;
-        this.historiaService = historiaService;  
         this.especialidadService = especialidadService;
         initializeUI();
     }
@@ -48,7 +46,7 @@ public class MainFrame extends JFrame implements DataChangeListener {
         tabbedPane.addTab("👨‍⚕️ Médicos", new DoctorPanel(medicoService, especialidadService, this));
         tabbedPane.addTab("🎓 Especialidades", new EspecialidadPanel(especialidadService));
         tabbedPane.addTab("📅 Citas", new AppointmentPanel(citaService, pacienteService, medicoService));
-        tabbedPane.addTab("📋 Historial", new HistoryPanel(historiaService));  
+        tabbedPane.addTab("📋 Historial", new HistoryPanel(citaService, pacienteService));  
         
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
         mainPanel.add(createStatusBar(), BorderLayout.SOUTH);

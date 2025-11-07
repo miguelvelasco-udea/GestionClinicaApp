@@ -1,0 +1,3 @@
+1;cirujano;
+1;prueba;prueba
+2;cardiologia;cardiologia

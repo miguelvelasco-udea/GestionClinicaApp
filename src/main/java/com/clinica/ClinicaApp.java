@@ -6,7 +6,6 @@ import javax.swing.*;
 
 public class ClinicaApp {
     public static void main(String[] args) {
-        // Inicializar servicios de tus compañeros
         PacienteService pacienteService = new PacienteService();
         MedicoService medicoService = new MedicoService();
         CitaService citaService = new CitaService();
@@ -15,7 +14,6 @@ public class ClinicaApp {
 
         SwingUtilities.invokeLater(() -> {
             try {
-                // Look and feel profesional
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 e.printStackTrace();
