@@ -1,3 +1,8 @@
-12345;mario;martinez;tines@g,ail.com;3123456;2;cardiologia
+<<<<<<< HEAD
 1023554879;Lola;Perez;lolaperez@gmail.com;3225746472;2;cardiologia
 1234578962;Maria;Nieto;nietomari@hotmail.com;3001245698;3;Dermatología
+1;David;Velmont;velomd@udea.edu.co;3225554178;4;Neurología
+10536862;David;Velmont;velmot@udea.edu.co;3216547862;4;Neurología
+=======
+12345;mario;martinez;tines@g,ail.com;3123456;2;cardiologia
+>>>>>>> parent of b8bd2af (add exception)

@@ -38,8 +38,6 @@ public class DoctorPanel extends JPanel {
         add(createFilterPanel(), BorderLayout.NORTH);
         add(createTablePanel(), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
-        
-   
     }
 
     private JPanel createFilterPanel() {

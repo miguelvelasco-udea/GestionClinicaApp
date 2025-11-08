@@ -37,7 +37,6 @@ public class PatientPanel extends JPanel {
         add(createButtonPanel(), BorderLayout.SOUTH);
         
         System.out.println("✅ DEBUG: PatientPanel UI inicializado");
-
     }
     
     private JPanel createSearchPanel() {
@@ -275,5 +274,20 @@ public class PatientPanel extends JPanel {
         }
     }
 
-
+    private void initializePanel() {
+    
+    // ✅ VERIFICAR VISIBILIDAD Y TAMAÑO
+    System.out.println("🔍 DEBUG: Verificando visibilidad del panel:");
+    System.out.println("   - Visible: " + this.isVisible());
+    System.out.println("   - Tamaño: " + this.getSize());
+    System.out.println("   - Preferido: " + this.getPreferredSize());
+    
+    if (patientTable != null) {
+        System.out.println("🔍 DEBUG: Verificando tabla:");
+        System.out.println("   - Tabla visible: " + patientTable.isVisible());
+        System.out.println("   - Tabla tamaño: " + patientTable.getSize());
+        System.out.println("   - Filas en modelo: " + tableModel.getRowCount());
+        System.out.println("   - Columnas en modelo: " + tableModel.getColumnCount());
+    }
+}
 }

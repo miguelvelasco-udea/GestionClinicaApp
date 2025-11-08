@@ -1,3 +1,1 @@
 1;2025-12-24;12:00;64118761686;lola;mendez;12345;mario;martinez;2;cardiologia;PROGRAMADA
-1;2025-11-15;08:00;4523485578;Maria;Lima;1023554879;Lola;Perez;2;cardiologia;PROGRAMADA
-1;2025-12-15;08:00;4523485578;Maria;Lima;1023554879;Lola;Perez;2;cardiologia;PROGRAMADA

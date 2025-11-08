@@ -1,4 +1,8 @@
 1;cirujano;
 1;prueba;prueba
 2;cardiologia;cardiologia
+<<<<<<< HEAD
 3;Dermatología;Dermatología
+4;Neurología;Neurología
+=======
+>>>>>>> parent of b8bd2af (add exception)

@@ -32,8 +32,6 @@ public class EspecialidadPanel extends JPanel {
         add(createSearchPanel(), BorderLayout.NORTH);
         add(createTablePanel(), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
-
-     
     }
 
     private JPanel createSearchPanel() {
