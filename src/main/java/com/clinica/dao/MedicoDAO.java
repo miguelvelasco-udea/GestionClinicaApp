@@ -48,33 +48,39 @@ public class MedicoDAO {
 
     // Obtiene lista de médicos
     public List<Medico> obtenerMedicos() {
-        List<Medico> lista = new ArrayList<>();
-        File f = new File(archivo);
-        if (!f.exists()) return lista;
+    List<Medico> lista = new ArrayList<>();
+    File f = new File(archivo);
+    if (!f.exists()) return lista;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(";");
-                if (datos.length >= 7) {
-                    String documento = datos[0];
-                    String nombre = datos[1];
-                    String apellido = datos[2];
-                    String email = datos[3];
-                    String telefono = datos[4];
-                    int idEspecialidad = Integer.parseInt(datos[5]);
-                    String nombreEspecialidad = datos[6];
+    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(";");
+            if (datos.length >= 7) {
+                String documento = datos[0];
+                String nombre = datos[1];
+                String apellido = datos[2];
+                String email = datos[3];
+                String telefono = datos[4];
+                int idEspecialidad = Integer.parseInt(datos[5]);
+                String nombreEspecialidad = datos[6];
 
+                // 🩺 Aquí colocas el bloque try–catch
+                try {
                     Especialidad esp = new Especialidad(idEspecialidad, nombreEspecialidad, "");
                     Medico m = new Medico(documento, nombre, apellido, email, telefono, esp);
                     lista.add(m);
+                } catch (Exception e) {
+                    System.err.println("Error al crear médico desde archivo: " + e.getMessage());
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error al leer archivo de médicos: " + e.getMessage());
         }
-        return lista;
+    } catch (IOException e) {
+        System.err.println("Error al leer archivo de médicos: " + e.getMessage());
     }
+    return lista;
+}
+
 
     // Actualiza médico existente
     public void actualizarMedico(Medico actualizado) {

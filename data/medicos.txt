@@ -1,1 +1,3 @@
 12345;mario;martinez;tines@g,ail.com;3123456;2;cardiologia
+1023554879;Lola;Perez;lolaperez@gmail.com;3225746472;2;cardiologia
+1234578962;Maria;Nieto;nietomari@hotmail.com;3001245698;3;Dermatología

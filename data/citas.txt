@@ -1,0 +1,3 @@
+1;2025-11-23;08:00;4523485578;Maria;Lima;limamaria@gmail.com;3118745213;1023554879;Lola;Perez;lolaperez@gmail.com;3225746472;2;cardiologia;PROGRAMADA
+2;2025-12-22;05:00;6214536987;Jose;Barrios;barrios@hotmail.com;3124569872;1023554879;Lola;Perez;lolaperez@gmail.com;3225746472;2;cardiologia;PROGRAMADA
+3;2025-11-25;17:00;6214536987;Jose;Barrios;barrios@hotmail.com;3124569872;1234578962;Maria;Nieto;nietomari@hotmail.com;3001245698;3;Dermatología;PROGRAMADA
