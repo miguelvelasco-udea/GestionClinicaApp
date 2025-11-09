@@ -90,11 +90,34 @@ public class EditDoctorDialog extends JDialog {
 
     private void saveDoctor() {
         try {
-            medico.setNombre(nombreField.getText());
-            medico.setApellido(apellidoField.getText());
-            medico.setEmail(emailField.getText());
-            medico.setTelefono(telefonoField.getText());
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String email = emailField.getText().trim();
+            String telefono = telefonoField.getText().trim();
             Especialidad especialidad = (Especialidad) especialidadComboBox.getSelectedItem();
+
+            // Validaciones
+            if (!nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Nombre inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Apellido inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
+                JOptionPane.showMessageDialog(this, "Correo inválido (debe tener @ y terminar en .com)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!telefono.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Teléfono inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            medico.setNombre(nombre);
+            medico.setApellido(apellido);
+            medico.setEmail(email);
+            medico.setTelefono(telefono);
             medico.setEspecialidad(especialidad);
 
             medicoService.actualizarMedico(medico);

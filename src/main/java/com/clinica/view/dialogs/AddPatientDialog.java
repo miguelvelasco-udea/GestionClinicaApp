@@ -12,17 +12,15 @@ public class AddPatientDialog extends JDialog {
     private JComboBox<Integer> diaComboBox, mesComboBox, anioComboBox;
     private JButton guardarButton, cancelButton;
     private PacienteService pacienteService;
-    private Runnable onPatientAdded; // Callback para actualizar la lista
+    private Runnable onPatientAdded;
 
-    // Constructor modificado
     public AddPatientDialog(Frame owner, PacienteService pacienteService, Runnable onPatientAdded) {
         super(owner, "Agregar Paciente", true);
         this.pacienteService = pacienteService;
-        this.onPatientAdded = onPatientAdded; // Recibimos el callback
+        this.onPatientAdded = onPatientAdded;
         initializeUI();
     }
 
-    // Constructor antiguo para compatibilidad
     public AddPatientDialog(Frame owner, PacienteService pacienteService) {
         this(owner, pacienteService, null);
     }
@@ -112,25 +110,37 @@ public class AddPatientDialog extends JDialog {
             LocalDate fechaNacimiento = LocalDate.of(anio, mes, dia);
             String historialMedico = historialMedicoField.getText().trim();
 
-            // ✅ Validar campos obligatorios
-            if (documento.isEmpty() || nombre.isEmpty() || apellido.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Documento, nombre y apellido son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+            // Validaciones
+            if (!documento.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Documento inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            System.out.println("DEBUG Dialog: Creando paciente - " + nombre + " " + apellido);
+            if (!nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Nombre inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Apellido inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
+                JOptionPane.showMessageDialog(this, "Correo inválido (debe tener @ y terminar en .com)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!telefono.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Teléfono inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             Paciente newPatient = new Paciente(documento, nombre, apellido, email, telefono, direccion, fechaNacimiento, historialMedico);
             pacienteService.registrarPaciente(newPatient);
 
             JOptionPane.showMessageDialog(this, "Paciente agregado exitosamente");
-            
-            // ✅ ACTUALIZAR LA LISTA EN LA VENTANA PRINCIPAL
+
             if (onPatientAdded != null) {
-                System.out.println("DEBUG Dialog: Ejecutando callback para actualizar tabla");
-                onPatientAdded.run(); // Esto actualiza la lista
+                onPatientAdded.run();
             }
-            
+
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el paciente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

@@ -77,12 +77,34 @@ public class AddDoctorDialog extends JDialog {
 
     private void saveDoctor() {
         try {
-            String documento = documentoField.getText();
-            String nombre = nombreField.getText();
-            String apellido = apellidoField.getText();
-            String email = emailField.getText();
-            String telefono = telefonoField.getText();
+            String documento = documentoField.getText().trim();
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String email = emailField.getText().trim();
+            String telefono = telefonoField.getText().trim();
             Especialidad especialidad = (Especialidad) especialidadComboBox.getSelectedItem();
+
+            // Validaciones
+            if (!documento.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Documento inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Nombre inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Apellido inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
+                JOptionPane.showMessageDialog(this, "Correo inválido (debe tener @ y terminar en .com)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!telefono.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Teléfono inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             Medico newDoctor = new Medico(documento, nombre, apellido, email, telefono, especialidad);
             medicoService.registrarMedico(newDoctor);

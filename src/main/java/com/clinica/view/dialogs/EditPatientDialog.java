@@ -13,24 +13,21 @@ public class EditPatientDialog extends JDialog {
     private JButton guardarButton, cancelButton;
     private PacienteService pacienteService;
     private Paciente paciente;
-    private Runnable onPatientUpdated; // ✅ NUEVO: Callback para actualizar
+    private Runnable onPatientUpdated;
 
-    // ✅ MODIFICADO: Constructor con callback
     public EditPatientDialog(Frame owner, PacienteService pacienteService, Paciente paciente, Runnable onPatientUpdated) {
         super(owner, "Editar Paciente", true);
         this.pacienteService = pacienteService;
         this.paciente = paciente;
-        this.onPatientUpdated = onPatientUpdated; // ✅ NUEVO: Recibir callback
+        this.onPatientUpdated = onPatientUpdated;
         initializeUI();
         fillData();
     }
 
-    // ✅ NUEVO: Constructor antiguo para compatibilidad
     public EditPatientDialog(Frame owner, PacienteService pacienteService, Paciente paciente) {
         this(owner, pacienteService, paciente, null);
     }
 
-    // El resto de tu código se mantiene IGUAL...
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
         setSize(400, 500);
@@ -121,26 +118,50 @@ public class EditPatientDialog extends JDialog {
 
     private void savePatient() {
         try {
-            paciente.setNombre(nombreField.getText());
-            paciente.setApellido(apellidoField.getText());
-            paciente.setEmail(emailField.getText());
-            paciente.setTelefono(telefonoField.getText());
-            paciente.setDireccion(direccionField.getText());
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String email = emailField.getText().trim();
+            String telefono = telefonoField.getText().trim();
+            String direccion = direccionField.getText().trim();
+            String historial = historialMedicoField.getText().trim();
+
+            // Validaciones
+            if (!nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Nombre inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
+                JOptionPane.showMessageDialog(this, "Apellido inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
+                JOptionPane.showMessageDialog(this, "Correo inválido (debe tener @ y terminar en .com)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (!telefono.matches("\\d{8,10}")) {
+                JOptionPane.showMessageDialog(this, "Teléfono inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            paciente.setNombre(nombre);
+            paciente.setApellido(apellido);
+            paciente.setEmail(email);
+            paciente.setTelefono(telefono);
+            paciente.setDireccion(direccion);
+            paciente.setHistorialMedico(historial);
             int dia = (int) diaComboBox.getSelectedItem();
             int mes = (int) mesComboBox.getSelectedItem();
             int anio = (int) anioComboBox.getSelectedItem();
             paciente.setFechaNacimiento(LocalDate.of(anio, mes, dia));
-            paciente.setHistorialMedico(historialMedicoField.getText());
 
             pacienteService.actualizarPaciente(paciente);
 
             JOptionPane.showMessageDialog(this, "Paciente actualizado exitosamente");
-            
-            // ✅ NUEVO: ACTUALIZAR LA LISTA EN LA VENTANA PRINCIPAL
+
             if (onPatientUpdated != null) {
-                onPatientUpdated.run(); // Esto actualiza la tabla
+                onPatientUpdated.run();
             }
-            
+
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el paciente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

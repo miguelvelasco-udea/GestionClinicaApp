@@ -10,8 +10,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class AppointmentPanel extends JPanel {
-    private JTable appointmentTable;
     private DefaultTableModel tableModel;
+    private JTable appointmentTable;
     private JComboBox<String> doctorComboBox, patientComboBox;
     private JTextField dateField, timeField;
     private CitaService citaService;
@@ -142,47 +142,75 @@ public class AppointmentPanel extends JPanel {
     }
     
     private void scheduleAppointment() {
-        try {
-            // Validar campos
-            if (doctorComboBox.getSelectedIndex() == -1 || 
-                patientComboBox.getSelectedIndex() == -1 ||
-                dateField.getText().trim().isEmpty() ||
-                timeField.getText().trim().isEmpty()) {
-                
-                JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios");
-                return;
-            }
+    try {
+        // Validar campos vacíos
+        if (doctorComboBox.getSelectedIndex() == -1 || 
+            patientComboBox.getSelectedIndex() == -1 ||
+            dateField.getText().trim().isEmpty() ||
+            timeField.getText().trim().isEmpty()) {
             
-            // Parsear fecha y hora
-            LocalDate fecha = LocalDate.parse(dateField.getText().trim());
-            LocalTime hora = LocalTime.parse(timeField.getText().trim());
-            
-            // Obtener médico y paciente seleccionados
-            List<Medico> medicos = medicoService.listarMedicos();
-            List<Paciente> pacientes = pacienteService.listarPacientes();
-            
-            Medico medicoSeleccionado = medicos.get(doctorComboBox.getSelectedIndex());
-            Paciente pacienteSeleccionado = pacientes.get(patientComboBox.getSelectedIndex());
-            
-            // Crear nueva cita
-            Cita nuevaCita = new Cita(fecha, hora, pacienteSeleccionado, medicoSeleccionado);
-            
-            // Guardar usando el servicio
-            citaService.crearCita(nuevaCita);
-            
-            // Recargar datos
-            loadAppointmentsData();
-            
-            // Limpiar campos
-            dateField.setText("");
-            timeField.setText("");
-            
-            JOptionPane.showMessageDialog(this, "✅ Cita agendada exitosamente");
-            
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "❌ Error al agendar cita: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios");
+            return;
         }
+
+        String fechaTexto = dateField.getText().trim();
+        String horaTexto = timeField.getText().trim();
+
+        // Validar formato de fecha yyyy-MM-dd
+        if (!fechaTexto.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Usa yyyy-MM-dd");
+            return;
+        }
+
+        // Validar formato de hora HH:mm
+        if (!horaTexto.matches("\\d{2}:\\d{2}")) {
+            JOptionPane.showMessageDialog(this, "Formato de hora inválido. Usa HH:mm");
+            return;
+        }
+
+        // Parsear fecha y hora
+        LocalDate fecha = LocalDate.parse(fechaTexto);
+        LocalTime hora = LocalTime.parse(horaTexto);
+
+        // Validar que la fecha no sea en el pasado
+        if (fecha.isBefore(LocalDate.now())) {
+            JOptionPane.showMessageDialog(this, "La fecha no puede ser en el pasado");
+            return;
+        }
+
+        // Validar que la hora esté entre 06:00 y 20:00
+        if (hora.isBefore(LocalTime.of(6, 0)) || hora.isAfter(LocalTime.of(20, 0))) {
+            JOptionPane.showMessageDialog(this, "La hora debe estar entre 06:00 y 20:00");
+            return;
+        }
+
+        // Obtener médico y paciente seleccionados
+        List<Medico> medicos = medicoService.listarMedicos();
+        List<Paciente> pacientes = pacienteService.listarPacientes();
+
+        Medico medicoSeleccionado = medicos.get(doctorComboBox.getSelectedIndex());
+        Paciente pacienteSeleccionado = pacientes.get(patientComboBox.getSelectedIndex());
+
+        // Crear nueva cita
+        Cita nuevaCita = new Cita(fecha, hora, pacienteSeleccionado, medicoSeleccionado);
+
+        // Guardar usando el servicio
+        citaService.crearCita(nuevaCita);
+
+        // Recargar datos
+        loadAppointmentsData();
+
+        // Limpiar campos
+        dateField.setText("");
+        timeField.setText("");
+
+        JOptionPane.showMessageDialog(this, "✅ Cita agendada exitosamente");
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "❌ Error al agendar cita: " + e.getMessage());
     }
+}
+
     
     private void cancelAppointment() {
         int selectedRow = appointmentTable.getSelectedRow();
