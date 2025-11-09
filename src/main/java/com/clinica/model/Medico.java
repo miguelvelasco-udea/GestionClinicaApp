@@ -1,17 +1,15 @@
 package com.clinica.model;
 
-import com.clinica.exception.DatosInvalidosException;
-
 public class Medico extends Persona {
     private Especialidad especialidad;
     
     // Constructor
     public Medico(String documento, String nombre, String apellido, String email, String telefono,
-              Especialidad especialidad) throws DatosInvalidosException {
-    super(documento, nombre, apellido, email, telefono);
-    this.especialidad = especialidad;
-}
-
+                    Especialidad especialidad) {
+        super(documento, nombre, apellido, email, telefono);
+        this.especialidad = especialidad;
+    }
+    
     // Getters y Setters
     public Especialidad getEspecialidad() {
         return especialidad;
