@@ -105,12 +105,12 @@ public class EditDoctorDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "Apellido inválido (solo letras, 3-20 caracteres)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
-                JOptionPane.showMessageDialog(this, "Correo inválido (debe tener @ y terminar en .com)", "Error", JOptionPane.ERROR_MESSAGE);
+            if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                JOptionPane.showMessageDialog(this, "Correo inválido (formato: usuario@dominio.extensión)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (!telefono.matches("\\d{8,10}")) {
-                JOptionPane.showMessageDialog(this, "Teléfono inválido (8-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Teléfono inválido (7-10 dígitos numéricos)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

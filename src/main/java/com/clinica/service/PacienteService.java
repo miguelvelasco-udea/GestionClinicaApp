@@ -2,6 +2,8 @@ package com.clinica.service;
 
 import com.clinica.dao.PacienteDAO;
 import com.clinica.model.Paciente;
+
+
 import java.util.List;
 
 public class PacienteService implements IPacienteService {
@@ -59,17 +61,25 @@ public class PacienteService implements IPacienteService {
         if (doc == null || !doc.matches("\\d{8,10}")) {
             throw new Exception("Documento inválido (8-10 dígitos numéricos).");
         }
+         // Validación de dígitos repetidos para docuemnto
+        if (tieneNumerosRepetidos(doc, 4)) {
+            throw new Exception("El documento no puede tener más de 4 dígitos iguales consecutivos.");
+        }
         if (nombre == null || !nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
             throw new Exception("Nombre inválido (solo letras, 3-20 caracteres).");
         }
         if (apellido == null || !apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$")) {
             throw new Exception("Apellido inválido (solo letras, 3-20 caracteres).");
         }
-        if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.com$")) {
-            throw new Exception("Correo inválido (debe tener @ y terminar en .com).");
+        if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new Exception("Correo inválido (formato: usuario@dominio.extensión).");
         }
         if (telefono == null || !telefono.matches("\\d{8,10}")) {
             throw new Exception("Teléfono inválido (8-10 dígitos numéricos).");
+        }
+        // dígitos repetidos para TELÉFONO
+        if (tieneNumerosRepetidos(telefono, 7)) {
+            throw new Exception("El teléfono no puede tener más de 7 dígitos iguales consecutivos.");
         }
 
         if (esNuevo && pacienteDAO.obtenerPacientes().stream().anyMatch(p -> p.getDocumento().equals(doc))) {
@@ -79,5 +89,32 @@ public class PacienteService implements IPacienteService {
         if (!esNuevo && pacienteDAO.obtenerPacientes().stream().noneMatch(p -> p.getDocumento().equals(doc))) {
             throw new Exception("No se encontró el paciente para actualizar.");
         }
+    }
+    // Detectar dígitos repetidos (usado por documento y teléfono)
+    private boolean tieneNumerosRepetidos(String numero, int maxRepetidos) {
+        if (numero == null || numero.length() < maxRepetidos + 1) {
+            return false;
+        }
+        
+        int contador = 1;
+        char caracterAnterior = numero.charAt(0);
+        
+        for (int i = 1; i < numero.length(); i++) {
+            char caracterActual = numero.charAt(i);
+            
+            if (caracterActual == caracterAnterior) {
+                contador++;
+                // Si encontramos más de maxRepetidos caracteres iguales consecutivos
+                if (contador > maxRepetidos) {
+                    return true;
+                }
+            } else {
+                contador = 1; // el contador se reinicia cuando cambia el carácter
+            }
+            
+            caracterAnterior = caracterActual;
+        }
+        
+        return false;
     }
 }
