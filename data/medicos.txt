@@ -1,4 +1,9 @@
 12345;mario;martinez;tines@g,ail.com;3123456;2;cardiologia
 1020109564;luis;montes;lulu@gmail.com;3000000000;1;prueba
+<<<<<<< HEAD
 66667643;Maria Jose;Ruiz Hernandez;hernandes@sura.es;555525554;2;cardiologia
 55553698;Amanda;Nunez;nunez@outlook.com;3002225477;1;prueba
+=======
+789464546;juliana;perez;juliana@hotmail.com;85445567;5;odontología
+32659874;Santana;restrepo;santa@hotmail.com;78945612;6;Neurología
+>>>>>>> da2e2cb46b09c07b463d678ce2625d1563955758

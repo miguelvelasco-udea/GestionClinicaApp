@@ -15,7 +15,7 @@ public class PacienteDAO {
 
     public PacienteDAO() {
         crearArchivoSiNoExiste();
-        verificarContenidoArchivo(); // ✅ Verificar contenido al iniciar
+        verificarContenidoArchivo(); //  Verificar contenido al iniciar
     }
 
     private void crearArchivoSiNoExiste() {

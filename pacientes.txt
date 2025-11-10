@@ -1,6 +1,11 @@
 887687678687;sara;Peña;peña@gmail.com;6866868;45 67 89;2004-01-06;
 4686416;milo;cardona;;68568558;;2018-01-01;
 64118761686;lola;mendez;;3625636;;1937-11-01;
+<<<<<<< HEAD
 1023459675;Leonardo;Montiel;moniel@gmail.com;3226547891;cr 67 98;2020-05-04;
 1023456789;amy;romero;am@gmail.com;77775412;cr 56;2022-02-03;
 102225456;amanda;rodriguez;rodrigues@gmail.com;3226665874;cr 67 -9;2018-08-08;
+=======
+123456778;Alberto;martinez;albertoelmejor@gmail.com;8562312145;Cr 459807;1980-01-01;hipertension
+159753246;nicolas;arboleda;arb@gmail.com;98756123;;2025-01-01;
+>>>>>>> da2e2cb46b09c07b463d678ce2625d1563955758
