@@ -63,7 +63,7 @@ public class MedicoService implements IMedicoService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Validaciones embebidas
+    //  Validaciones embebidas
     private void validarMedico(Medico medico, boolean esNuevo) throws Exception {
         if (medico == null) throw new Exception("El médico no puede ser nulo.");
 

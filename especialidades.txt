@@ -1,4 +1,5 @@
-1;cirujano;
 1;prueba;prueba
 2;cardiologia;cardiologia
 3;hugug;test
+5;odontología;salud dental
+6;Neurología;Sistema nervioso

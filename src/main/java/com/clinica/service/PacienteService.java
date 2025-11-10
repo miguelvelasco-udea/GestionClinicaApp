@@ -46,7 +46,7 @@ public class PacienteService implements IPacienteService {
         return pacienteDAO.obtenerPacientes();
     }
 
-    // ✅ Validaciones embebidas
+    //  Validaciones embebidas
     private void validarPaciente(Paciente paciente, boolean esNuevo) throws Exception {
         if (paciente == null) throw new Exception("El paciente no puede ser nulo.");
 

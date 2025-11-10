@@ -1,2 +1,4 @@
 12345;mario;martinez;tines@g,ail.com;3123456;2;cardiologia
 1020109564;luis;montes;lulu@gmail.com;3000000000;1;prueba
+789464546;juliana;perez;juliana@hotmail.com;85445567;5;odontología
+32659874;Santana;restrepo;santa@hotmail.com;78945612;6;Neurología

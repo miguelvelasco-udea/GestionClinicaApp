@@ -74,7 +74,7 @@ public class CitaService implements ICitaService {
         return citaDAO.obtenerCitas();
     }
 
-    // ✅ Validación centralizada
+    //  Validación centralizada
     private void validarCita(Cita cita, boolean esNueva) throws Exception {
         if (cita == null) throw new Exception("La cita no puede ser nula");
         if (cita.getPaciente() == null || cita.getPaciente().getDocumento() == null ||
